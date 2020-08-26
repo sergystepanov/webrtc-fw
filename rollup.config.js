@@ -9,6 +9,7 @@ export default {
   output: {
     file: 'dist/bundle.js',
     format: 'es',
+    sourcemap: true,
   },
   plugins: [
     resolve(),

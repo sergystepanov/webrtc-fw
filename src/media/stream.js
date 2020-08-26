@@ -1,5 +1,3 @@
-import './stream.css';
-
 /**
  * Stream module based on the HTML5 Video element.
  *
