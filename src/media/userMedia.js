@@ -4,10 +4,10 @@
  * Contains a wrapper for user's media streams.
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia}.
  *
- * @module media/user
+ * @module media/userMedia
  * @example
  *
- * import UserMedia from './media/user'
+ * import UserMedia from './media/userMedia'
  *
  * const um = UserMedia();
  *

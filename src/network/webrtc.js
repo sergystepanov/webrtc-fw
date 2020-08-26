@@ -1,4 +1,4 @@
-import signallingApi from '../api/signallingApiV1';
+import signallingBuilder from './signalling';
 import { addParamsToCodec } from '../network/sdp';
 
 /**
@@ -25,6 +25,7 @@ export default function ({
       { urls: 'stun:stun.l.google.com:19302' },
     ],
   },
+  signallingApi = signallingBuilder(),
   onPrepare,
   onPrepareFail,
   onConnect,
