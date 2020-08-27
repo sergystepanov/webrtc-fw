@@ -47,4 +47,4 @@ function UserMedia({ constraints = { video: true, audio: true }, onNotSupported,
   });
 }
 
-export default { UserMedia };
+export default UserMedia;
