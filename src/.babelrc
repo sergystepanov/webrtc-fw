@@ -1,5 +1,15 @@
 {
-  "presets": [["@babel/preset-env", { "modules": false }]],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": false,
+        "targets": {
+          "esmodules": true
+        }
+      }
+    ]
+  ],
 
   "plugins": [
     "@babel/plugin-proposal-nullish-coalescing-operator",
