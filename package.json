@@ -1,7 +1,11 @@
 {
   "name": "webrtc-fw",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A WebRTC client-side framework",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "esnext": "lib/index.js",
+  "unpkg": "dist/webrtc-fw.bundle.min.js",
   "scripts": {
     "build": "rollup -c",
     "test": "jest --coverage"
