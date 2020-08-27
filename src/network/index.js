@@ -1,6 +1,5 @@
-import Ajax from './ajax';
-import signallingBuilder from './signalling';
-import Socket from './socket';
-import Webrtc from './webrtc';
-
-export { Ajax, signallingBuilder, Socket, Webrtc };
+export * from './protocol/sdp';
+export * from './protocol/signalling';
+export * from './transport/ajax';
+export * from './transport/socket';
+export * from './webrtc';

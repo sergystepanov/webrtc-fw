@@ -1,5 +1,5 @@
-import signallingBuilder from './signalling';
-import { addParamsToCodec } from '../network/sdp';
+import { SignallingBuilder } from './protocol/signalling';
+import { addParamsToCodec } from './protocol/sdp';
 
 /**
  * Webrtc module based on RTCPeerConnection element.
@@ -8,14 +8,15 @@ import { addParamsToCodec } from '../network/sdp';
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection}.
  *
  * @module network/webrtc
+ *
  * @example
  *
- * import WebRTC from './network/webrtc'
+ * import { WebRTC } from './network/webrtc'
  *
  * const w = WebRTC();
  *
  */
-export default function ({
+function WebRTC({
   reconnects = 3,
   stopLocalIce = false,
   rtc = {
@@ -25,7 +26,7 @@ export default function ({
       { urls: 'stun:stun.l.google.com:19302' },
     ],
   },
-  signallingApi = signallingBuilder(),
+  signallingApi = SignallingBuilder(),
   onPrepare,
   onPrepareFail,
   onConnect,
@@ -296,3 +297,5 @@ export default function ({
     addStream,
   });
 }
+
+export { WebRTC };

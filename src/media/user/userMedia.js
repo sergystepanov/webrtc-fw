@@ -4,19 +4,16 @@
  * Contains a wrapper for user's media streams.
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia}.
  *
- * @module media/userMedia
+ * @module media/user/userMedia
+ *
  * @example
  *
- * import UserMedia from './media/userMedia'
+ * import { UserMedia } from './media/user/userMedia'
  *
  * const um = UserMedia();
  *
  */
-export default function ({
-  constraints = { video: true, audio: true },
-  onNotSupported,
-  onError,
-} = {}) {
+function UserMedia({ constraints = { video: true, audio: true }, onNotSupported, onError } = {}) {
   let supported = !!navigator.mediaDevices.getUserMedia;
   let stream;
 
@@ -49,3 +46,5 @@ export default function ({
     stop,
   });
 }
+
+export { UserMedia };

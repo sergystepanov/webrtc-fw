@@ -4,15 +4,16 @@
  * Contains a wrapper for HTML Video element
  * {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video}.
  *
- * @module media/stream
+ * @module media/stream/stream
+ *
  * @example
  *
- * import Stream from './media/stream'
+ * import { Stream } from './media/stream/stream'
  *
  * const s = Stream();
  *
  */
-export default function ({
+function Stream({
   autoplay = true,
   controls = true,
   muted = false,
@@ -68,3 +69,5 @@ export default function ({
     reset,
   });
 }
+
+export { Stream };

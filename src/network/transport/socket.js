@@ -1,10 +1,13 @@
 /**
  * WebSocket connections module.
  *
- * @param {string} address A WebSocket address value.
- * @example <caption>Example usage of socket module.</caption>
+ * @module network/transport/socket
  *
- * import Socket from './socket'
+ * @param {string} address A WebSocket address value.
+ *
+ * @example
+ *
+ * import { Socket } from './network/transport/socket'
  *
  * const conn = Socket({
  *  address: 'ws://localhost:1234/ws',
@@ -13,7 +16,7 @@
  * conn.send('test');
  *
  */
-export default function ({
+function Socket({
   socket = WebSocket,
   address,
   binaryType = 'arraybuffer',
@@ -85,3 +88,5 @@ export const STATE = Object.freeze({
   // The connection is closed or couldn't be opened.
   CLOSED: 3,
 });
+
+export { Socket };

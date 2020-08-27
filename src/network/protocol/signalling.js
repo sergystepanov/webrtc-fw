@@ -1,7 +1,7 @@
 /**
  * Webrtc signalling module builder.
  *
- * @module network/signalling
+ * @module network/protocol/signalling
  *
  * @param {Object} [params={}] An optional list of building params.
  * @param {Object} [params.factory] A custom signalling factory.
@@ -31,7 +31,7 @@
  *  .onConnect((x) => console.log(x))
  *  .build();
  */
-export default function signallingBuilder({ factory } = {}) {
+function SignallingBuilder({ factory } = {}) {
   let url, onConnect, onClose, onError, onServerError, onMessage, onOffer, onOpen;
 
   return {
@@ -84,3 +84,5 @@ export default function signallingBuilder({ factory } = {}) {
     },
   };
 }
+
+export { SignallingBuilder };

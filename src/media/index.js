@@ -1,4 +1,2 @@
-import Stream from './stream';
-import UserMedia from './userMedia';
-
-export { Stream, UserMedia };
+export * from './stream/stream';
+export * from './user/userMedia';
