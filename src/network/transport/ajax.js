@@ -22,7 +22,7 @@
 function Ajax(url, { options = {}, timeout = 10000 } = {}) {
   return new Promise((resolve, reject) => {
     const controller = new AbortController();
-    const signal = controller.signal;
+    const { signal } = controller;
 
     fetch(url, { ...options, signal }).then(resolve, () => {
       controller.abort();
@@ -37,4 +37,4 @@ function Ajax(url, { options = {}, timeout = 10000 } = {}) {
   });
 }
 
-export { Ajax };
+export default Ajax;

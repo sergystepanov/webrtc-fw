@@ -1,5 +1,4 @@
-import { SignallingBuilder } from './protocol/signalling';
-import { addParamsToCodec } from './protocol/sdp';
+import SignallingBuilder from './protocol/signalling';
 
 /**
  * Webrtc module based on RTCPeerConnection element.
@@ -8,12 +7,6 @@ import { addParamsToCodec } from './protocol/sdp';
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection}.
  *
  * @module network/webrtc
- *
- * @example
- *
- * import { WebRTC } from './network/webrtc'
- *
- * const w = WebRTC();
  *
  */
 function WebRTC({
@@ -51,16 +44,16 @@ function WebRTC({
   const dataChannels = new Map();
 
   const signalling = signallingApi()
-    .onConnect((signalling) => {
+    .onConnect((signallingBuild) => {
       reconnect = false;
-      onConnect?.(signalling);
+      onConnect?.(signallingBuild);
     })
     .onError((event) => {
       onError?.(event);
       if (!reconnect) reconnect = setTimeout(prepare, 3000);
     })
     .onServerError((error) => {
-      console.error(`[webrtc] got signalling error:`, error);
+      console.error('[webrtc] got signalling error:', error);
       shutdown();
     })
     .onClose((event) => {
@@ -86,27 +79,126 @@ function WebRTC({
       } else {
         console.warn(`[webrtc] unhandled message: ${message}`);
       }
+
+      onMessage?.(message);
     })
     .onOpen((event) => onOpen?.(event))
     .build();
 
-  const connect = () => {
-    resetState();
-
-    connection = new RTCPeerConnection(rtc);
-    connection.onconnectionstatechange = _onConnectionStateChange;
-    connection.ondatachannel = _onDataChannel;
-    // make Trickle ICE (1)
-    connection.onicecandidate = _onIceCandidate;
-    connection.oniceconnectionstatechange = _onIceConnectionStateChange;
-    connection.onicegatheringstatechange = _onIceGatheringStateChange;
-    connection.ontrack = onRemoteTrack;
-  };
+  const isActive = () => !!connection;
 
   /**
    * @returns {RTCPeerConnection}
    */
   const getConnection = () => connection;
+
+  const connect = () => {
+    resetState();
+
+    connection = new RTCPeerConnection(rtc);
+    connection.onconnectionstatechange = onConnectionStateChange;
+    connection.ondatachannel = onDataChannel;
+    // make Trickle ICE (1)
+    connection.onicecandidate = onIceCandidate;
+    connection.oniceconnectionstatechange = onIceConnectionStateChange;
+    connection.onicegatheringstatechange = onIceGatheringStateChange;
+    connection.ontrack = onRemoteTrack;
+  };
+
+  // make Trickle ICE (2)
+  async function onRemoteIceCandidate(ice) {
+    console.debug('[webrtc][ice] received ice', ice);
+    await connection?.addIceCandidate(new RTCIceCandidate(ice));
+  }
+
+  // Local description was set, send it to peer
+  async function onLocalDescription(desc) {
+    console.log('[webrtc] got local SDP');
+
+    // force stereo in Chrome
+    // !to fix inf loop in Firefox
+    // desc.sdp = addParamsToCodec(desc.sdp, 'opus', { 'sprop-stereo': 1, stereo: 1 });
+
+    await connection?.setLocalDescription(desc);
+    console.debug(`[webrtc] sending SDP ${desc.type}`);
+    signalling?.offerSession(connection.localDescription);
+  }
+
+  function onDataChannelOpen(event) {
+    console.debug('[webrtc][data-chan] has been opened', event);
+  }
+
+  function onDataChannelMessageReceived(event) {
+    console.debug('[webrtc][data-chan] got a message', event, event.data.type);
+
+    const isText = typeof event.data === 'string' || event.data instanceof String;
+    console.info(`[webrtc][data-chan][${isText ? 'txt' : 'bin'}] message: ${event.data}`);
+
+    dataChannels.get('ch0').send('Hey!');
+  }
+
+  function onDataChannelError(error) {
+    console.error('[webrtc][data-chan] an error', error);
+  }
+
+  function onDataChannelClose(event) {
+    console.debug('[webrtc][data-chan] closed', event);
+  }
+
+  /**
+   * This happens whenever the aggregate state of the connection changes.
+   */
+  function onConnectionStateChange() {
+    console.debug(
+      `[webrtc] connection state change [${state.connectionState}] -> [${connection.connectionState}]`,
+    );
+    state.connectionState = connection.connectionState;
+  }
+
+  function onIceCandidate(event) {
+    if (!stopLocalIce && state.localIceCompleted) return;
+
+    const { candidate } = event;
+
+    if (candidate === null) {
+      state.localIceCompleted = true;
+      console.log('[webrtc][ice] ICE gathering is complete');
+      return;
+    }
+    console.debug('[webrtc][ice] got ice', candidate);
+
+    signalling?.offerCandidate(candidate);
+  }
+
+  function onIceConnectionStateChange() {
+    console.debug(
+      `[webrtc][ice] ICE connection state change [${state.iceConnectionState}] -> [${connection.iceConnectionState}]`,
+    );
+    state.iceConnectionState = connection.iceConnectionState;
+  }
+
+  function onIceGatheringStateChange() {
+    console.debug(
+      `[webrtc][ice] ICE gathering state change [${state.iceGatheringState}] -> [${connection.iceGatheringState}]`,
+    );
+    state.iceGatheringState = connection.iceGatheringState;
+  }
+
+  /**
+   * This event, of type RTCDataChannelEvent, is sent when an RTCDataChannel
+   * is added to the connection by the remote peer calling createDataChannel().
+   *
+   * @param {RTCDataChannelEvent} event
+   */
+  function onDataChannel(event) {
+    console.debug('[webrtc] data channel has been created', event.channel);
+
+    const inChannel = event.channel;
+    inChannel.onopen = onDataChannelOpen;
+    inChannel.onmessage = onDataChannelMessageReceived;
+    inChannel.onerror = onDataChannelError;
+    inChannel.onclose = onDataChannelClose;
+  }
 
   function openPeerConnection(message) {
     if (isActive()) return;
@@ -151,26 +243,6 @@ function WebRTC({
     // + wait for a local stream
   }
 
-  function prepare() {
-    onPrepare?.();
-
-    if (signalling) {
-      if (++state.connectionAttempts > reconnects) {
-        onPrepareFail?.();
-        return;
-      }
-
-      signalling?.connect();
-    }
-  }
-
-  function shutdown() {
-    state.connectionState = '';
-    signalling?.close();
-  }
-
-  const isActive = () => !!connection;
-
   /**
    * Adds user stream into the WebRTC connection.
    * @param {*} stream
@@ -184,99 +256,23 @@ function WebRTC({
     onLocalDescription(sdp);
   }
 
-  // make Trickle ICE (2)
-  async function onRemoteIceCandidate(ice) {
-    console.debug(`[webrtc][ice] received ice`, ice);
-    await connection?.addIceCandidate(new RTCIceCandidate(ice));
-  }
+  function prepare() {
+    onPrepare?.();
 
-  // Local description was set, send it to peer
-  async function onLocalDescription(desc) {
-    console.log(`[webrtc] got local SDP`);
+    if (signalling) {
+      if (state.connectionAttempts > reconnects) {
+        onPrepareFail?.();
+        return;
+      }
 
-    // force stereo in Chrome
-    // !to fix inf loop in Firefox
-    // desc.sdp = addParamsToCodec(desc.sdp, 'opus', { 'sprop-stereo': 1, stereo: 1 });
-
-    await connection?.setLocalDescription(desc);
-    console.debug(`[webrtc] sending SDP ${desc.type}`);
-    signalling?.offerSession(connection.localDescription);
-  }
-
-  function onDataChannelOpen(event) {
-    console.debug('[webrtc][data-chan] has been opened', event);
-  }
-
-  function onDataChannelMessageReceived(event) {
-    console.debug('[webrtc][data-chan] got a message', event, event.data.type);
-
-    const isText = typeof event.data === 'string' || event.data instanceof String;
-    console.info(`[webrtc][data-chan][${isText ? 'txt' : 'bin'}] message: ${event.data}`);
-
-    dataChannels.get('ch0').send('Hey!');
-  }
-
-  function onDataChannelError(error) {
-    console.error('[webrtc][data-chan] an error', error);
-  }
-
-  function onDataChannelClose(event) {
-    console.debug('[webrtc][data-chan] closed', event);
-  }
-
-  /**
-   * This happens whenever the aggregate state of the connection changes.
-   */
-  function _onConnectionStateChange() {
-    console.debug(
-      `[webrtc] connection state change [${state.connectionState}] -> [${connection.connectionState}]`
-    );
-    state.connectionState = connection.connectionState;
-  }
-
-  function _onIceCandidate(event) {
-    if (!stopLocalIce && state.localIceCompleted) return;
-
-    const { candidate } = event;
-
-    if (candidate === null) {
-      state.localIceCompleted = true;
-      console.log('[webrtc][ice] ICE gathering is complete');
-      return;
+      state.connectionAttempts += 1;
+      signalling?.connect();
     }
-    console.debug(`[webrtc][ice] got ice`, candidate);
-
-    signalling?.offerCandidate(candidate);
   }
 
-  function _onIceConnectionStateChange() {
-    console.debug(
-      `[webrtc][ice] ICE connection state change [${state.iceConnectionState}] -> [${connection.iceConnectionState}]`
-    );
-    state.iceConnectionState = connection.iceConnectionState;
-  }
-
-  function _onIceGatheringStateChange() {
-    console.debug(
-      `[webrtc][ice] ICE gathering state change [${state.iceGatheringState}] -> [${connection.iceGatheringState}]`
-    );
-    state.iceGatheringState = connection.iceGatheringState;
-  }
-
-  /**
-   * This event, of type RTCDataChannelEvent, is sent when an RTCDataChannel
-   * is added to the connection by the remote peer calling createDataChannel().
-   *
-   * @param {RTCDataChannelEvent} event
-   */
-  function _onDataChannel(event) {
-    console.debug('[webrtc] data channel has been created', event.channel);
-
-    let inChannel = event.channel;
-    inChannel.onopen = onDataChannelOpen;
-    inChannel.onmessage = onDataChannelMessageReceived;
-    inChannel.onerror = onDataChannelError;
-    inChannel.onclose = onDataChannelClose;
+  function shutdown() {
+    state.connectionState = '';
+    signalling?.close();
   }
 
   function resetState() {
@@ -298,4 +294,4 @@ function WebRTC({
   });
 }
 
-export { WebRTC };
+export default WebRTC;

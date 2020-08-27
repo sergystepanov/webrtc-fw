@@ -70,4 +70,4 @@ function Stream({
   });
 }
 
-export { Stream };
+export default Stream;

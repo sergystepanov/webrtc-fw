@@ -11,7 +11,8 @@
  * @param {Function} [params.factory.onClose] A post-close handler callback.
  * @param {Function} [params.factory.onError] A custom error handler callback. Returns an error.
  * @param {Function} [params.factory.onServerError] A server exception handler callback.
- * @param {Function} [params.factory.onMessage] An incoming message handler callback. Returns a message.
+ * @param {Function} [params.factory.onMessage] An incoming message handler callback.
+ *                                              Returns a message.
  * @param {Function} [params.factory.onOffer] A remote offer handler callback.
  *
  * @typedef {Object} Signalling
@@ -32,45 +33,52 @@
  *  .build();
  */
 function SignallingBuilder({ factory } = {}) {
-  let url, onConnect, onClose, onError, onServerError, onMessage, onOffer, onOpen;
+  let url;
+  let onConnect;
+  let onClose;
+  let onError;
+  let onServerError;
+  let onMessage;
+  let onOffer;
+  let onOpen;
 
   return {
-    url: function (address) {
+    url(address) {
       url = address;
       return this;
     },
-    onConnect: function (callback) {
+    onConnect(callback) {
       onConnect = callback;
       return this;
     },
-    onClose: function (callback) {
+    onClose(callback) {
       onClose = callback;
       return this;
     },
-    onError: function (callback) {
+    onError(callback) {
       onError = callback;
       return this;
     },
-    onServerError: function (callback) {
+    onServerError(callback) {
       onServerError = callback;
       return this;
     },
-    onMessage: function (callback) {
+    onMessage(callback) {
       onMessage = callback;
       return this;
     },
-    onOffer: function (callback) {
+    onOffer(callback) {
       onOffer = callback;
       return this;
     },
-    onOpen: function (callback) {
+    onOpen(callback) {
       onOpen = callback;
       return this;
     },
     /**
      * @return {Signalling} Signalling
      */
-    build: function () {
+    build() {
       return factory({
         url,
         onConnect,
@@ -85,4 +93,4 @@ function SignallingBuilder({ factory } = {}) {
   };
 }
 
-export { SignallingBuilder };
+export default SignallingBuilder;

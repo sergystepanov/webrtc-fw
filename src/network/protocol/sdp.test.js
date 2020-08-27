@@ -1,8 +1,6 @@
-import { addParamsToCodec } from './sdp';
+import addParamsToCodec from './sdp';
 
 test('if custom video options are set', () => {
-  const data = 'abc';
-
   const sdp = `
 v=0
 o=- 3080139182658193640 2 IN IP4 127.0.0.1

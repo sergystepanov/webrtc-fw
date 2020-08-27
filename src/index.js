@@ -1,4 +1,5 @@
 import 'webrtc-adapter';
 
-export * from './media';
-export * from './network';
+export { default as WebRTC } from './network/webrtc';
+export { default as SignallingBuilder } from './network/protocol/signalling';
+export { default as Socket } from './network/transport/socket/socket';

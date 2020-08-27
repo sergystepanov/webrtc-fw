@@ -1,0 +1,17 @@
+{
+  "extends": "airbnb-base",
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest/globals": true
+  },
+  "plugins": ["jest"],
+  "rules": {
+    "object-curly-newline": "off",
+    "new-cap": "off",
+    "no-use-before-define": ["error", { "functions": false, "classes": true, "variables": true }],
+    "no-console": "off",
+    "no-unused-expressions": "off"
+  },
+  "parser": "babel-eslint"
+}

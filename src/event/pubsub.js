@@ -1,4 +1,4 @@
-export default function () {
+export default function pubsub() {
   const subs = new Set();
 
   const sub = (fn) => {

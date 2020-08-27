@@ -12,21 +12,25 @@
  * // let sdp = 'some sdp string'
  * sdp = addParamsToCodec(sdp, 'opus', {stereo: 1})
  */
-export const addParamsToCodec = (sdp, name, params) => {
-  const _params = Object.entries(params)
+const addParamsToCodec = (sdp, name, params) => {
+  const values = Object.entries(params)
     .map((x) => `${x[0]}=${x[1]}`)
     .join(';');
 
-  let search = new RegExp(`a=rtpmap:(\\d+) ${name}/`, 'gi');
-  let found;
-  let ids = [];
-  while ((found = search.exec(sdp)) !== null) {
+  const search = new RegExp(`a=rtpmap:(\\d+) ${name}/`, 'gi');
+  const ids = [];
+  let found = search.exec(sdp);
+  while (found !== null) {
     ids.push(found[1]);
+    found = search.exec(sdp);
   }
+  let sdpMod = sdp;
   ids.forEach((n) => {
     console.info(`[sdp] mod /${name}/ track #${n}`);
-    sdp = sdp.replace(new RegExp(`(a=fmtp:${n} .*)`), `$1;${_params}`);
+    sdpMod = sdpMod.replace(new RegExp(`(a=fmtp:${n} .*)`), `$1;${values}`);
   });
 
-  return sdp;
+  return sdpMod;
 };
+
+export default addParamsToCodec;

@@ -14,7 +14,7 @@
  *
  */
 function UserMedia({ constraints = { video: true, audio: true }, onNotSupported, onError } = {}) {
-  let supported = !!navigator.mediaDevices.getUserMedia;
+  const supported = !!navigator.mediaDevices.getUserMedia;
   let stream;
 
   if (!supported) onNotSupported?.();
@@ -36,7 +36,7 @@ function UserMedia({ constraints = { video: true, audio: true }, onNotSupported,
     if (!supported) return;
 
     // Release the webcam and mic
-    stream?.getTracks().forEach(function (track) {
+    stream?.getTracks().forEach((track) => {
       track.stop();
     });
   };
@@ -47,4 +47,4 @@ function UserMedia({ constraints = { video: true, audio: true }, onNotSupported,
   });
 }
 
-export { UserMedia };
+export default { UserMedia };
