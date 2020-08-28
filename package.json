@@ -1,12 +1,13 @@
 {
   "name": "webrtc-fw",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A WebRTC client-side framework",
   "main": "lib/index.js",
   "module": "lib/index.js",
   "esnext": "lib/index.js",
   "scripts": {
     "build": "rollup -c",
+    "prepublishOnly": "npm run build",
     "lint": "eslint src/**/*.js",
     "test": "jest --coverage"
   },
@@ -24,9 +25,9 @@
     "@rollup/plugin-node-resolve": "^9.0.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
-    "eslint": "^7.2.0",
+    "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^23.20.0",
     "jest": "^26.4.2",
     "rollup": "^2.26.6",

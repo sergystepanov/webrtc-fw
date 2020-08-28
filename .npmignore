@@ -6,3 +6,11 @@ coverage/
 
 # Source folder
 src/
+
+__mocks__/
+
+.babelrc
+.browserslistrc
+.eslintrc
+.gitignore
+rollup.config.js
