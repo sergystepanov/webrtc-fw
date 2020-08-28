@@ -3,6 +3,8 @@ import SOCKET_STATE from './state';
 /**
  * WebSocket connections module.
  *
+ * !to add simple head-of-line blocking workarounds.
+ *
  * @module network/transport/socket
  *
  * @param {string} address A WebSocket address value.
@@ -35,11 +37,23 @@ function Socket({
   conn.binaryType = binaryType;
 
   /**
+   * Checks if there is buffered data on the client.
+   * @param {WebSocket} connection Socket connection.
+   */
+  // const isBuffered = (connection) => connection.bufferedAmount > 0;
+
+  /**
+   * Compares connection state with the provided value.
+   * @param {string} state A state to expect.
+   */
+  const stateIs = (state) => conn?.readyState === state;
+
+  /**
    * Sends a message into the socket.
    * @param {string | ArrayBuffer} data Some data value to send into the socket.
    */
   const send = (data) => {
-    if (conn.readyState === SOCKET_STATE.OPEN) {
+    if (stateIs(SOCKET_STATE.OPEN)) {
       console.debug(`[socket] sending: ${data}`);
       conn.send(data);
     } else {
@@ -52,7 +66,7 @@ function Socket({
     console.debug(`[socket] there are [${messageQueue.length}] messages in the queue`);
 
     let message = messageQueue.pop();
-    while (message && conn.readyState === SOCKET_STATE.OPEN) {
+    while (message && stateIs(SOCKET_STATE.OPEN)) {
       send(message);
       message = messageQueue.pop();
     }
