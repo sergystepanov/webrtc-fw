@@ -4,6 +4,7 @@ import SOCKET_STATE from './state';
  * WebSocket connections module.
  *
  * !to add simple head-of-line blocking workarounds.
+ * !to add sub-protocols support.
  *
  * @module network/transport/socket
  *
