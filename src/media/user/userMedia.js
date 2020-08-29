@@ -6,12 +6,12 @@
  *
  * @module media/user/userMedia
  *
- * @example
- *
- * import { UserMedia } from './media/user/userMedia'
- *
- * const um = UserMedia();
- *
+ * @param {Object} [params={}] An optional list of params.
+ * @param {Object} [params.constraints] Custom media constraints.
+ * @param {boolean} [params.constraints.video] Enables user's video.
+ * @param {boolean} [params.constraints.audio] Enables user's audio.
+ * @param {Function} [params.onNotSupported] A callback when user media is not supported.
+ * @param {Function} [params.onError] A post-error handler callback.
  */
 function UserMedia({ constraints = { video: true, audio: true }, onNotSupported, onError } = {}) {
   const supported = !!navigator.mediaDevices.getUserMedia;
@@ -35,7 +35,7 @@ function UserMedia({ constraints = { video: true, audio: true }, onNotSupported,
   const stop = () => {
     if (!supported) return;
 
-    // Release the webcam and mic
+    // Release user's media devices
     stream?.getTracks().forEach((track) => {
       track.stop();
     });
