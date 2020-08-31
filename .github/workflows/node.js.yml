@@ -27,9 +27,6 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
-
-    - name: Make test coverage
-      run: jest --coverage
       
     - name: Upload to Coveralls
       uses: coverallsapp/github-action@master
