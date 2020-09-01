@@ -1,6 +1,6 @@
 {
   "name": "webrtc-fw",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "A WebRTC client-side framework",
   "main": "lib/index.js",
   "module": "lib/index.js",
