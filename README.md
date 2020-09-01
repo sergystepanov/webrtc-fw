@@ -6,6 +6,10 @@ A simple WebRTC client-side framework.
 
 ## How to use
 
+1. Implement signalling server communication wrapped with provided `SignallingBuilder`.
+2. Create new instance of `WebRTC` object with the signalling API.
+3. Call `WebRTC` connection init method: `.prepare`.
+
 ```javascript
 import { WebRTC, SignallingBuilder, Socket } from 'webrtc-fw';
 
@@ -80,18 +84,14 @@ const rtc = WebRTC({
     api,
     onConnect: onServerConnect,
     onPrepare: onServerPrepare,
-    onPrepareFail: () => {
-      setError('Too many connection attempts, aborting. Refresh page to try again');
-    },
-    onError: () => {
-      setError("Couldn't connect to server");
-    },
+    onPrepareFail: () => console.error('Too many connection attempts, aborting. Refresh page to try again'),
+    onError: () => console.error("Couldn't connect to server"),
     onClose: onServerClose,
     onOpen: onServerOpen,
     onRemoteTrack,
   });
 
-  // opens new WebRTC connection
-  rtc.prepare();
+// opens new WebRTC connection
+rtc.prepare();
 }
 ```
