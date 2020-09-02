@@ -4,6 +4,12 @@
 
 A simple WebRTC client-side framework.
 
+## How to install
+
+```
+npm i webrtc-fw
+```
+
 ## How to use
 
 1. Implement signalling server communication wrapped with provided `SignallingBuilder`.
