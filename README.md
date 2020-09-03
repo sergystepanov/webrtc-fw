@@ -12,13 +12,14 @@ npm i webrtc-fw
 
 ## How to use
 
-1. Implement signalling server communication wrapped with provided `SignallingBuilder`.
+1. Implement signalling server communication layer wrapped into provided `SignallingBuilder`.
 2. Create new instance of `WebRTC` object with the signalling API.
-3. Call `WebRTC` connection init method: `.prepare`.
+3. Initialize `WebRTC` connection with the `prepare` method.
 
 ```javascript
 import { WebRTC, SignallingBuilder, Socket } from 'webrtc-fw';
 
+// [1]
 // a signalling server API implementation
 //
 // example Websocket server communication
@@ -86,6 +87,7 @@ function factory({
 
 const api = () => SignallingBuilder({ factory });
 
+// [2]
 const rtc = WebRTC({
     api,
     onConnect: onServerConnect,
@@ -97,6 +99,7 @@ const rtc = WebRTC({
     onRemoteTrack,
   });
 
+// [3]
 // opens new WebRTC connection
 rtc.prepare();
 }
