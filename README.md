@@ -92,7 +92,7 @@ const rtc = WebRTC({
     api,
     onConnect: onServerConnect,
     onPrepare: onServerPrepare,
-    onPrepareFail: () => console.error('Too many connection attempts, aborting. Refresh page to try again'),
+    onPrepareFail: () => console.error('Too many failed connection attempts, aborting'),
     onError: () => console.error("Couldn't connect to server"),
     onClose: onServerClose,
     onOpen: onServerOpen,
